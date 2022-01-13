@@ -1,38 +1,146 @@
-.App {
+body {
+  background-image: url("./back.jpg");
+  background-position: inherit;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.App h1 {
+  font-family: "The Nautigal", cursive;
+  color: rgba(0, 174, 255, 0.699);
+  margin: 0;
+}
+
+.container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  position: relative;
+}
+
+.plannerHeaderContainer {
+  position: relative;
+  height: 120px;
+}
+
+.plannerHeaderContainer .plannerHeader {
+  position: fixed;
+  width: 100%;
+}
+
+.projectName > div {
+  width: 55%;
+  position: relative;
+}
+
+.projectName .projectNameHeader > div {
+  position: absolute;
+  background-color: rgba(71, 40, 22, 0.712);
+  width: 100%;
+  text-align: center;
+  border-radius: 5px;
+  z-index: -1;
+}
+
+.projectName .projectNameHeader p {
+  margin: 0;
+  padding-top: 2px;
+  font-size: clamp(10px, 4vw, 40px);
+  font-family: "EB Garamond", serif;
+  color: #fff;
+}
+
+.projectName .projectNameInput {
+  z-index: 1;
+}
+
+.projectName .projectNameInput input {
+  width: 100%;
+  font-size: clamp(10px, 4vw, 40px);
+  opacity: 0;
+  font-family: "EB Garamond", serif;
+  cursor: pointer;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.projectName .showNameInput {
+  opacity: 1 !important;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.addNewListContainer {
+  position: relative;
+  height: 70px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.addNewListContainer .addNewList {
+  position: fixed;
+  width: 100%;
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
+  cursor: pointer;
+}
+
+.addNewListContainer .addNewList p {
+  margin: 0;
+}
+
+.addNewListContainer .addNewList:hover {
+  background-color: rgba(255, 255, 255, 0.904);
+}
+
+.addSomeElement {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  height: -webkit-min-content;
+  height: -moz-min-content;
+  height: min-content;
+  padding: 5px;
 }
 
-.App-link {
-  color: #61dafb;
+.addSomeElement img {
+  height: 20px;
+  padding: 5px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.createdListsContainer {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: (230px)[15];
+      grid-template-columns: repeat(15, 230px);
+  grid-column-gap: 10px;
 }
+
+.createdListsContainer .createdList {
+  padding: 5px;
+  text-align: center;
+  border-radius: 7px;
+}
+
+.list {
+  background-color: rgba(255, 255, 255, 0.603);
+}
+
+.list p {
+  font-family: "Roboto", sans-serif;
+}
+
+.hideElem {
+  display: none;
+}
+
+.overlap {
+  position: absolute;
+  height: 60px;
+  width: 230px;
+}
+/*# sourceMappingURL=App.css.map */
