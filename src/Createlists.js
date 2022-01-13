@@ -31,7 +31,7 @@ export class CreateLists extends Component {
 
     addCard(event) {
 
-        let elemKey = determineListNumber(event);
+        let elemKey = determineListNumber(event, "card");
         let allLists = this.state.lists;
         if (this.state.taskName != "") {
             allLists[elemKey][1].push(this.state.taskName);
@@ -69,7 +69,7 @@ export class CreateLists extends Component {
     }
 
     changeListName(event) {
-        let elemKey = determineListNumber(event);
+        let elemKey = determineListNumber(event, "list");
         let allLists = this.state.lists;
         allLists[elemKey][0] = event.target.value;
         this.setState({
@@ -78,6 +78,16 @@ export class CreateLists extends Component {
         })
     }
 
+    changeTaskName(e) {
+        console.log(e);
+        let elemKey = determineListNumber(e, "task");
+        let allLists = this.state.lists;
+        allLists[elemKey][1][elemKey] = e.target.value;
+        this.setState({
+            taskName: "",
+            lists: allLists
+        })
+    }
 
 
     render() {
@@ -115,8 +125,8 @@ export class CreateLists extends Component {
                             <div>
                                 <div>
                                     {allLists[key][1].map((item, listKey) => (
-                                        <div key={listKey}>
-                                            <div>
+                                        <div className={`listName listName${listKey}`} key={listKey}>
+                                            <div className="listNamePar">
                                                 <p>{item}</p>
                                             </div>
 
@@ -125,8 +135,8 @@ export class CreateLists extends Component {
                                                     maxLength="17"
                                                     onFocus={(event) => { showInputName(event) }}
                                                     onBlur={(blurEvent) => { hideInputName(blurEvent) }}
-                                                    onChange={(e) => { this.changeListName(e) }}
-                                                    value={allLists[key][0]}></input>
+                                                    onChange={(e) => { this.changeTaskName(e) }}
+                                                    value={allLists[key][1][listKey]}></input>
                                             </div>
                                         </div>
 
