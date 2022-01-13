@@ -1,11 +1,33 @@
 $fontPlannerName: 'The Nautigal', cursive;
 $fontProjectName: 'EB Garamond', serif;
 $fontText: 'Roboto', sans-serif;
+$fintSizeListName: 20px;
 $projectNameBackground: rgba(71, 40, 22, 0.712);
 $listsBackground: rgba(255, 255, 255, 0.603);
 $tasksCardWidth: 230px;
+$borderRadius: 7px;
 
 
+
+@mixin inputForNames {
+    opacity: 0;
+    font-family: $fontProjectName;
+    cursor: pointer;
+    text-align: center;
+}
+
+li  {
+    list-style-type: none;
+    text-align: justify;
+    padding: 5px;
+    margin: 5px;
+    background-color: rgb(255, 255, 255);
+    border-radius: $borderRadius;
+}
+
+ul {
+    padding-left: 5px;
+}
 
 body {
   background-image: url("./back.jpg");
@@ -36,7 +58,6 @@ body {
   }
 }
 
-
 .projectName {
 
   & > div {
@@ -49,7 +70,7 @@ body {
     background-color: $projectNameBackground;
     width: 100%;
     text-align: center;
-    border-radius: 5px;
+    border-radius: $borderRadius;
     z-index: -1;
   }
 
@@ -66,19 +87,40 @@ body {
   }
   
   & .projectNameInput input {
+    @include inputForNames;
     width: 100%;
     font-size: clamp(10px, 4vw, 40px);
-    opacity: 0;
-    font-family: $fontProjectName;
-    cursor: pointer;
-    text-align: center;
-  }
-  
-  & .showNameInput {
-    opacity: 1 !important;
   }
 }
 
+.showNameInput {
+    opacity: 1 !important;
+  }
+
+.listName {
+        display: flex;
+        justify-content: center;
+
+    & .listNamePar {
+        position: absolute;
+
+        & p {
+            font-size: $fintSizeListName;
+            margin: 12px;
+            font-family: $fontProjectName;
+            
+        }
+    }
+    & .listNameInput {
+        padding: 10px;
+        z-index: 1;
+
+        & input {
+            @include inputForNames;
+            font-size: $fintSizeListName;
+        }
+    }
+}
 
 .addNewListContainer {
   position: relative;
@@ -121,7 +163,7 @@ body {
   & .createdList {
     padding: 5px;
     text-align: center;
-    border-radius: 7px;
+    border-radius: $borderRadius;
   }
 }
 

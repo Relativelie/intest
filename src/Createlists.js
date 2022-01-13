@@ -1,5 +1,6 @@
 import { Component } from "react";
 import plus from './plus.png';
+import { hideInputName, showInputName, determineListNumber } from "./basefunctions";
 
 
 export class CreateLists extends Component {
@@ -30,8 +31,7 @@ export class CreateLists extends Component {
 
     addCard(event) {
 
-        let elem = event.target.parentElement.parentElement.parentElement.classList[2];
-        let elemKey = elem.substring(11, elem.length);
+        let elemKey = determineListNumber(event);
         let allLists = this.state.lists;
         if (this.state.taskName != "") {
             allLists[elemKey][1].push(this.state.taskName);
@@ -49,28 +49,36 @@ export class CreateLists extends Component {
 
     showAndHideElem(e) {
         const hiddenElem = e.target;
-        // if (e.relatedTarget != null) {
-            if (hiddenElem.className === "overlap") {
-                hiddenElem.parentElement.classList.add("hideElem");
-                hiddenElem.parentElement.parentElement.children[1].classList.remove("hideElem");
-                hiddenElem.parentElement.parentElement.children[1].children[0].focus();
-            }
+        if (hiddenElem.className === "overlap") {
+            hiddenElem.parentElement.classList.add("hideElem");
+            hiddenElem.parentElement.parentElement.children[1].classList.remove("hideElem");
+            hiddenElem.parentElement.parentElement.children[1].children[0].focus();
+        }
 
 
-            else if (e.relatedTarget === null || e.relatedTarget.className != "btnAddCard") {
-                hiddenElem.parentElement.classList.add("hideElem");
-                hiddenElem.parentElement.parentElement.children[0].classList.remove("hideElem");
-                this.setState({ taskName: "" })
-            }
+        else if (e.relatedTarget === null || e.relatedTarget.className != "btnAddCard") {
+            hiddenElem.parentElement.classList.add("hideElem");
+            hiddenElem.parentElement.parentElement.children[0].classList.remove("hideElem");
+            this.setState({ taskName: "" })
+        }
 
 
-            else if (e.relatedTarget.className === "btnAddCard") {
-
-                hiddenElem.parentElement.parentElement.children[1].children[0].focus();
-            }
-            console.log(this.state.taskName)
-        // }
+        else if (e.relatedTarget.className === "btnAddCard") {
+            hiddenElem.parentElement.parentElement.children[1].children[0].focus();
+        }
     }
+
+    changeListName(event) {
+        let elemKey = determineListNumber(event);
+        let allLists = this.state.lists;
+        allLists[elemKey][0] = event.target.value;
+        this.setState({
+            taskName: "",
+            lists: allLists
+        })
+    }
+
+
 
     render() {
         let allLists = this.state.lists;
@@ -90,15 +98,44 @@ export class CreateLists extends Component {
                 <div className="createdListsContainer">
                     {Object.keys(allLists).map((key) => (
                         <div key={key} className={`createdList list createdList${key}`}>
-                            <div>
-                                <p>{allLists[key][0]}</p>
+                            <div className="listName">
+                                <div className="listNamePar">
+                                    <p>{allLists[key][0]}</p>
+                                </div>
+
+                                <div className="listNameInput">
+                                    <input type="text"
+                                        maxLength="17"
+                                        onFocus={(event) => { showInputName(event) }}
+                                        onBlur={(blurEvent) => { hideInputName(blurEvent) }}
+                                        onChange={(e) => { this.changeListName(e) }}
+                                        value={allLists[key][0]}></input>
+                                </div>
                             </div>
                             <div>
-                                <ul>
+                                <div>
                                     {allLists[key][1].map((item, listKey) => (
-                                        <li key={listKey}>{item}</li>
+                                        <div key={listKey}>
+                                            <div>
+                                                <p>{item}</p>
+                                            </div>
+
+                                            <div className="listNameInput">
+                                                <input type="text"
+                                                    maxLength="17"
+                                                    onFocus={(event) => { showInputName(event) }}
+                                                    onBlur={(blurEvent) => { hideInputName(blurEvent) }}
+                                                    onChange={(e) => { this.changeListName(e) }}
+                                                    value={allLists[key][0]}></input>
+                                            </div>
+                                        </div>
+
+
+
+
                                     ))}
-                                </ul>
+                                </div>
+
                             </div>
                             <div className="addCards">
                                 <div className="addSomeElement" onClick={(e) => this.showAndHideElem(e)}>

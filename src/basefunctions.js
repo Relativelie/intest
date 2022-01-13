@@ -11,4 +11,9 @@ export function hideInputName(e) {
     inputElem.classList.toggle("showNameInput");
 }
 
+export function determineListNumber (event) {
+    let elem = event.target.parentElement.parentElement.parentElement.classList[2];
+    let elemKey = elem.substring(11, elem.length);
+    return elemKey
+}
 
