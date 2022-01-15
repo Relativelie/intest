@@ -1,4 +1,5 @@
 import { Component } from "react";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import plus from './plus.png';
 import { hideInputName, showInputName, determineListNumber } from "./basefunctions";
 
@@ -8,7 +9,7 @@ export class CreateLists extends Component {
         super();
 
         this.state = {
-            lists: {},
+            lists: [],
             listNumber: 0,
             taskName: ""
         }
@@ -89,6 +90,18 @@ export class CreateLists extends Component {
         })
     }
 
+    handleOnDragEnd(result) {
+        if (!result.destination) return;
+        const listOfItems = this.state.lists;
+        const items = Array.from(listOfItems);
+        const [recordedItem] = items.splice(result.source.index, 1);
+        items.splice(result.destination.index, 0, recordedItem)
+
+        this.setState({
+            lists: items
+        })
+    }
+
 
     render() {
         let allLists = this.state.lists;
@@ -104,71 +117,84 @@ export class CreateLists extends Component {
                     </div>
                 </div>
 
+                <DragDropContext onDragEnd={this.handleOnDragEnd.bind(this)}>
 
-                <div className="createdListsContainer">
-                    {Object.keys(allLists).map((key) => (
-                        <div key={key} className={`createdList list createdList${key}`}>
-                            <div className="listName">
-                                <div className="listNamePar">
-                                    <p>{allLists[key][0]}</p>
-                                </div>
+                    <Droppable droppableId="characters" direction="horizontal">
+                        {(provided) => (
+                            <div className="createdListsContainer" {...provided.droppableProps} ref={provided.innerRef} >
+                                {Object.keys(allLists).map((key, index) => (
+                                    <Draggable key={key} draggableId={key} index={index}>
+                                        {(provided) => (
+                                            <div className={`createdList list createdList${key}`} {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
+                                                <div className="listName">
+                                                    <div className="listNamePar">
+                                                        <p>{allLists[key][0]}</p>
+                                                    </div>
 
-                                <div className="listNameInput">
-                                    <input type="text"
-                                        maxLength="17"
-                                        onFocus={(event) => { showInputName(event) }}
-                                        onBlur={(blurEvent) => { hideInputName(blurEvent) }}
-                                        onChange={(e) => { this.changeListName(e) }}
-                                        value={allLists[key][0]}></input>
-                                </div>
-                            </div>
-                            <div>
-                                <div>
-                                    {allLists[key][1].map((item, listKey) => (
-                                        <div className={`listName listName${listKey}`} key={listKey}>
-                                            <div className="listNamePar">
-                                                <p>{item}</p>
+                                                    <div className="listNameInput">
+                                                        <input type="text"
+                                                            maxLength="17"
+                                                            onFocus={(event) => { showInputName(event) }}
+                                                            onBlur={(blurEvent) => { hideInputName(blurEvent) }}
+                                                            onChange={(e) => { this.changeListName(e) }}
+                                                            value={allLists[key][0]}></input>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div>
+                                                        {allLists[key][1].map((item, listKey) => (
+                                                            <div className={`listName listName${listKey}`} key={listKey}>
+                                                                <div className="listNamePar">
+                                                                    <p>{item}</p>
+                                                                </div>
+
+                                                                <div className="listNameInput">
+                                                                    <input type="text"
+                                                                        maxLength="17"
+                                                                        onFocus={(event) => { showInputName(event) }}
+                                                                        onBlur={(blurEvent) => { hideInputName(blurEvent) }}
+                                                                        onChange={(e) => { this.changeTaskName(e) }}
+                                                                        value={allLists[key][1][listKey]}></input>
+                                                                </div>
+                                                            </div>
+
+
+
+
+                                                        ))}
+                                                    </div>
+
+                                                </div>
+                                                <div className="addCards">
+                                                    <div className="addSomeElement" onClick={(e) => this.showAndHideElem(e)}>
+                                                        <div className="overlap"></div>
+                                                        <img src={plus} alt="plus"></img>
+                                                        <p>Add a card</p>
+
+
+                                                    </div>
+                                                    <div className="inputFieldForTasks hideElem">
+                                                        <input type="text"
+                                                            placeholder="Enter task name"
+                                                            onChange={(e) => { this.changeTasktName(e.target.value) }}
+                                                            onBlur={(blurEvent) => { this.showAndHideElem(blurEvent) }}
+                                                            value={this.state.taskName}></input>
+                                                        <button className="btnAddCard" onClick={(event) => this.addCard(event)}>Add card</button>
+                                                        <button onClick={(e) => this.showAndHideElem(e)}>X</button>
+                                                    </div>
+                                                </div>
+                                                
                                             </div>
 
-                                            <div className="listNameInput">
-                                                <input type="text"
-                                                    maxLength="17"
-                                                    onFocus={(event) => { showInputName(event) }}
-                                                    onBlur={(blurEvent) => { hideInputName(blurEvent) }}
-                                                    onChange={(e) => { this.changeTaskName(e) }}
-                                                    value={allLists[key][1][listKey]}></input>
-                                            </div>
-                                        </div>
-
-
-
-
-                                    ))}
-                                </div>
-
+                                        )}
+                                        
+                                    </Draggable>
+                                ))}
+                                {provided.placeholder}
                             </div>
-                            <div className="addCards">
-                                <div className="addSomeElement" onClick={(e) => this.showAndHideElem(e)}>
-                                    <div className="overlap"></div>
-                                    <img src={plus} alt="plus"></img>
-                                    <p>Add a card</p>
-
-
-                                </div>
-                                <div className="inputFieldForTasks hideElem">
-                                    <input type="text"
-                                        placeholder="Enter task name"
-                                        onChange={(e) => { this.changeTasktName(e.target.value) }}
-                                        onBlur={(blurEvent) => { this.showAndHideElem(blurEvent) }}
-                                        value={this.state.taskName}></input>
-                                    <button className="btnAddCard" onClick={(event) => this.addCard(event)}>Add card</button>
-                                    <button onClick={(e) => this.showAndHideElem(e)}>X</button>
-                                </div>
-                            </div>
-
-                        </div>
-                    ))}
-                </div>
+                        )}
+                    </Droppable>
+                </DragDropContext>
             </div>
         )
     }
