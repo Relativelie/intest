@@ -1,0 +1,50 @@
+$fontPlannerName: 'The Nautigal', cursive;
+$fontProjectName: 'EB Garamond', serif;
+$fontText: 'Roboto', sans-serif;
+$fontSizeListName: 20px;
+$projectNameBackground: rgba(71, 40, 22, 0.712);
+$listsBackground: rgba(255, 255, 255, 0.603);
+$tasksCardWidth: 230px;
+$borderRadius: 7px;
+
+
+
+@mixin inputForNames {
+    opacity: 0;
+    font-family: $fontProjectName;
+    cursor: pointer;
+    text-align: center;
+}
+
+
+@mixin nameOfElem($fontSize, $fontFamily, $inputWidth, $fontColor) {
+  display: flex;
+  justify-content: center;
+
+& .namePar {
+  position: absolute;
+
+  & p {
+      font-size: $fontSize;
+      margin: 12px;
+      font-family: $fontFamily;
+      @if ($fontColor) {
+        color: $fontColor;
+      };
+
+      
+  }
+}
+& .nameInput {
+  padding: 10px;
+  z-index: 1;
+
+  & input {
+      @include inputForNames;
+      font-size: $fontSize;
+      @if ($inputWidth) {
+        width: $inputWidth;
+      }
+  }
+}
+}

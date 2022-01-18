@@ -31,8 +31,7 @@ export class CreateLists extends Component {
     }
 
     addCard(event) {
-
-        let elemKey = determineListNumber(event, "card");
+        let elemKey = determineListNumber(event, {elementName: "addTask"});
         let allLists = this.state.lists;
         if (this.state.taskName != "") {
             allLists[elemKey][1].push(this.state.taskName);
@@ -41,10 +40,9 @@ export class CreateLists extends Component {
                 lists: allLists
             })
         }
-
     }
 
-    changeTasktName(event) {
+    changeTaskName(event) {
         this.setState({ taskName: event })
     }
 
@@ -56,76 +54,89 @@ export class CreateLists extends Component {
             hiddenElem.parentElement.parentElement.children[1].children[0].focus();
         }
 
-
         else if (e.relatedTarget === null || e.relatedTarget.className != "btnAddCard") {
             hiddenElem.parentElement.classList.add("hideElem");
             hiddenElem.parentElement.parentElement.children[0].classList.remove("hideElem");
             this.setState({ taskName: "" })
         }
 
-
         else if (e.relatedTarget.className === "btnAddCard") {
             hiddenElem.parentElement.parentElement.children[1].children[0].focus();
         }
     }
 
-    changeListName(event) {
-        let elemKey = determineListNumber(event, "list");
+    changeElemName(event, elem) {
+        let elemKey = determineListNumber(event, {elementName: elem});
         let allLists = this.state.lists;
-        allLists[elemKey][0] = event.target.value;
+        if (elem === "list") {
+            allLists[elemKey][0] = event.target.value;
+        }
+        
+        else if (elem === "task") {
+            allLists[elemKey][1][elemKey] = event.target.value;
+        }
+
         this.setState({
             taskName: "",
             lists: allLists
         })
     }
 
-    changeTaskName(e) {
-        let elemKey = determineListNumber(e, "task");
-        let allLists = this.state.lists;
-        allLists[elemKey][1][elemKey] = e.target.value;
-        this.setState({
-            taskName: "",
-            lists: allLists
-        })
+
+    nameOfElements(props) {
+
+        return (
+            <div className={props.blockName}>
+    
+                <div className="namePar">
+                    <p>{props.parText}</p>
+                </div>
+    
+                <div className="nameInput">
+                    <input type="text"
+                        maxLength="17"
+                        onFocus={(event) => { showInputName(event) }}
+                        onBlur={(blurEvent) => { hideInputName(blurEvent) }}
+                        onChange={(e) => { this.changeElemName(e, props.elementName) }}
+                        value={props.inputValue}></input>
+                </div>
+            </div>
+        )
     }
 
     handleOnDragEnd(result) {
-        if (result.type==="group") {
+        if (result.type === "group") {
             if (!result.destination) return;
             const listOfItems = this.state.lists;
             const items = Array.from(listOfItems);
             const [recordedItem] = items.splice(result.source.index, 1);
             items.splice(result.destination.index, 0, recordedItem)
-    
+
             this.setState({
                 lists: items
             })
         }
-
         else if (result.type === "tasks") {
-
             let allLists = this.state.lists;
-
             if (!result.destination) return;
 
             // the index of the list where the element is moved to
             let destinationDrop = result.destination.droppableId;
-            destinationDrop = destinationDrop.substring(5,destinationDrop.length);
+            destinationDrop = destinationDrop.substring(5, destinationDrop.length);
 
             // the index of the task where the element is moved to(inside the list)
             let destinationDrag = this.calculateTaskIndex(result.destination.index, destinationDrop);
 
             // the index of the list where the elem is moved from
             let dropFrom = result.source.droppableId;
-            dropFrom = dropFrom.substring(5,dropFrom.length);
+            dropFrom = dropFrom.substring(5, dropFrom.length);
 
             // the index of the task where the element is moved from(inside the list)
             let dragFrom = this.calculateTaskIndex(result.source.index, dropFrom);
-            
+
             let dragItemText = allLists[dropFrom][1][dragFrom];
             allLists[dropFrom][1].splice(dragFrom, 1);
             allLists[destinationDrop][1].splice(destinationDrag, 0, dragItemText);
-            
 
             this.setState({
                 lists: allLists
@@ -134,21 +145,19 @@ export class CreateLists extends Component {
     }
 
     assignTaskIndexForGrag(listNumber, key) {
-
         let allLists = this.state.lists;
         let numberOfTask = 0;
         if (!allLists[listNumber - 1]) return parseInt(key);
         else {
-            while (listNumber != 0 ) {
+            while (listNumber != 0) {
                 numberOfTask += parseInt(allLists[listNumber - 1][1].length);
                 listNumber--;
             }
             return (parseInt(numberOfTask + parseInt(key)))
         }
-}
+    }
 
     calculateTaskIndex(index, listKey) {
-
         let allLists = this.state.lists;
         let currentListKey = 0;
 
@@ -156,10 +165,9 @@ export class CreateLists extends Component {
             index -= allLists[currentListKey][1].length;
             currentListKey++;
         }
-
         return index
-
     }
+
 
     render() {
         let allLists = this.state.lists;
@@ -185,77 +193,61 @@ export class CreateLists extends Component {
                                         {(provided) => (
 
                                             <div className={`createdList list createdList${key}`} {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
-                                                <div className="listName">
-                                                    <div className="listNamePar">
-                                                        <p>{allLists[key][0]}</p>
-                                                    </div>
-
-                                                    <div className="listNameInput">
-                                                        <input type="text"
-                                                            maxLength="17"
-                                                            onFocus={(event) => { showInputName(event) }}
-                                                            onBlur={(blurEvent) => { hideInputName(blurEvent) }}
-                                                            onChange={(e) => { this.changeListName(e) }}
-                                                            value={allLists[key][0]}></input>
-                                                    </div>
-                                                </div>
+                                                {this.nameOfElements({
+                                                    blockName: "listName",
+                                                    elementName: "list",
+                                                    parText: allLists[key][0],
+                                                    inputValue: allLists[key][0]
+                                                })}
                                                 <div>
-                                                <Droppable droppableId={`tasks${key}`} type="tasks">
-                                                    {(provided) => (
-                                                    <div {...provided.droppableProps} ref={provided.innerRef}>
-                                                        {
-                                                        allLists[key][1].map((item, taskKey) => (
 
-                                                            <Draggable type="tasks" key={this.assignTaskIndexForGrag(key, taskKey)} draggableId={`taskDrag${this.assignTaskIndexForGrag(key, taskKey)}`} index={this.assignTaskIndexForGrag(key, taskKey)}>
-                                                                
-                                                                {(provided) => ( 
-                                        
-                                                            <div className={`listName listName${taskKey}`} {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
-                                                                <div className="listNamePar">
-                                                                    <p>{item}</p>
-                                                                </div>
+                                                    <Droppable droppableId={`tasks${key}`} type="tasks">
+                                                        {(provided) => (
+                                                            <div {...provided.droppableProps} ref={provided.innerRef}>
+                                                                {allLists[key][1].map((item, taskKey) => (
 
-                                                                <div className="listNameInput">
-                                                                    <input type="text"
-                                                                        maxLength="17"
-                                                                        onFocus={(event) => { showInputName(event) }}
-                                                                        onBlur={(blurEvent) => { hideInputName(blurEvent) }}
-                                                                        onChange={(e) => { this.changeTaskName(e) }}
-                                                                        value={allLists[key][1][taskKey]}></input>
-                                                                </div>
+                                                                        <Draggable type="tasks" key={this.assignTaskIndexForGrag(key, taskKey)} draggableId={`taskDrag${this.assignTaskIndexForGrag(key, taskKey)}`} index={this.assignTaskIndexForGrag(key, taskKey)}>
+
+                                                                            {(provided) => (
+                                                                                <div className={`listName${taskKey}`} {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
+                                                                                    {this.nameOfElements({
+                                                                                        blockName: "listName",
+                                                                                        elementName: "task",
+                                                                                        parText: item,
+                                                                                        inputValue: allLists[key][1][taskKey]
+                                                                                    })}
+                                                                                </div>
+                                                                            )}
+                                                                        </Draggable>
+
+                                                                    ))}
+                                                                {provided.placeholder}
                                                             </div>
-                                                            )}
-                                                            </Draggable>
-
-                                                        ))}
-                                                        {provided.placeholder}
-                                                    </div>
-                                                    )}
+                                                        )}
                                                     </Droppable>
+
                                                 </div>
                                                 <div className="addCards">
                                                     <div className="addSomeElement" onClick={(e) => this.showAndHideElem(e)}>
                                                         <div className="overlap"></div>
                                                         <img src={plus} alt="plus"></img>
                                                         <p>Add a card</p>
-
-
                                                     </div>
                                                     <div className="inputFieldForTasks hideElem">
                                                         <input type="text"
                                                             placeholder="Enter task name"
-                                                            onChange={(e) => { this.changeTasktName(e.target.value) }}
+                                                            onChange={(e) => { this.changeTaskName(e.target.value) }}
                                                             onBlur={(blurEvent) => { this.showAndHideElem(blurEvent) }}
                                                             value={this.state.taskName}></input>
                                                         <button className="btnAddCard" onClick={(event) => this.addCard(event)}>Add card</button>
                                                         <button onClick={(e) => this.showAndHideElem(e)}>X</button>
                                                     </div>
                                                 </div>
-                                                
+
                                             </div>
 
                                         )}
-                                        
+
                                     </Draggable>
                                 ))}
                                 {provided.placeholder}

@@ -1,5 +1,5 @@
 import { Component } from "react";
-import {hideInputName, showInputName} from "./basefunctions";
+import { hideInputName, showInputName } from "./basefunctions";
 
 
 export class ProjectName extends Component {
@@ -20,13 +20,10 @@ export class ProjectName extends Component {
     render() {
         return (
             <div className="projectName container">
-                <div>
-                    <div className="projectNameHeader">
-                        <div>
-                            <p>{this.state.name}</p>
-                        </div>
+                    <div className="namePar">
+                        <p>{this.state.name}</p>
                     </div>
-                    <div className="projectNameInput">
+                    <div className="nameInput">
                         <input type="text"
                             maxLength="34"
                             onFocus={(event) => { showInputName(event) }}
@@ -34,7 +31,6 @@ export class ProjectName extends Component {
                             onChange={(e) => { this.changeProjectName(e.target.value) }}
                             value={this.state.name}></input>
                     </div>
-                </div>
             </div>
         )
     }
