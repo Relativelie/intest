@@ -80,7 +80,6 @@ export class CreateLists extends Component {
     }
 
     changeTaskName(e) {
-        console.log(e);
         let elemKey = determineListNumber(e, "task");
         let allLists = this.state.lists;
         allLists[elemKey][1][elemKey] = e.target.value;
@@ -91,17 +90,76 @@ export class CreateLists extends Component {
     }
 
     handleOnDragEnd(result) {
-        if (!result.destination) return;
-        const listOfItems = this.state.lists;
-        const items = Array.from(listOfItems);
-        const [recordedItem] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index, 0, recordedItem)
+        if (result.type==="group") {
+            if (!result.destination) return;
+            const listOfItems = this.state.lists;
+            const items = Array.from(listOfItems);
+            const [recordedItem] = items.splice(result.source.index, 1);
+            items.splice(result.destination.index, 0, recordedItem)
+    
+            this.setState({
+                lists: items
+            })
+        }
 
-        this.setState({
-            lists: items
-        })
+        else if (result.type === "tasks") {
+
+            let allLists = this.state.lists;
+
+            if (!result.destination) return;
+
+            // the index of the list where the element is moved to
+            let destinationDrop = result.destination.droppableId;
+            destinationDrop = destinationDrop.substring(5,destinationDrop.length);
+
+            // the index of the task where the element is moved to(inside the list)
+            let destinationDrag = this.calculateTaskIndex(result.destination.index, destinationDrop);
+
+            // the index of the list where the elem is moved from
+            let dropFrom = result.source.droppableId;
+            dropFrom = dropFrom.substring(5,dropFrom.length);
+
+            // the index of the task where the element is moved from(inside the list)
+            let dragFrom = this.calculateTaskIndex(result.source.index, dropFrom);
+            
+            let dragItemText = allLists[dropFrom][1][dragFrom];
+            allLists[dropFrom][1].splice(dragFrom, 1);
+            allLists[destinationDrop][1].splice(destinationDrag, 0, dragItemText);
+            
+
+            this.setState({
+                lists: allLists
+            })
+        }
     }
 
+    assignTaskIndexForGrag(listNumber, key) {
+
+        let allLists = this.state.lists;
+        let numberOfTask = 0;
+        if (!allLists[listNumber - 1]) return parseInt(key);
+        else {
+            while (listNumber != 0 ) {
+                numberOfTask += parseInt(allLists[listNumber - 1][1].length);
+                listNumber--;
+            }
+            return (parseInt(numberOfTask + parseInt(key)))
+        }
+}
+
+    calculateTaskIndex(index, listKey) {
+
+        let allLists = this.state.lists;
+        let currentListKey = 0;
+
+        while (currentListKey != parseInt(listKey)) {
+            index -= allLists[currentListKey][1].length;
+            currentListKey++;
+        }
+
+        return index
+
+    }
 
     render() {
         let allLists = this.state.lists;
@@ -119,12 +177,13 @@ export class CreateLists extends Component {
 
                 <DragDropContext onDragEnd={this.handleOnDragEnd.bind(this)}>
 
-                    <Droppable droppableId="characters" direction="horizontal">
+                    <Droppable droppableId="lists" direction="horizontal" type="group">
                         {(provided) => (
                             <div className="createdListsContainer" {...provided.droppableProps} ref={provided.innerRef} >
                                 {Object.keys(allLists).map((key, index) => (
-                                    <Draggable key={key} draggableId={key} index={index}>
+                                    <Draggable type="group" key={key} draggableId={`list${key}`} index={index}>
                                         {(provided) => (
+
                                             <div className={`createdList list createdList${key}`} {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
                                                 <div className="listName">
                                                     <div className="listNamePar">
@@ -141,9 +200,17 @@ export class CreateLists extends Component {
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <div>
-                                                        {allLists[key][1].map((item, listKey) => (
-                                                            <div className={`listName listName${listKey}`} key={listKey}>
+                                                <Droppable droppableId={`tasks${key}`} type="tasks">
+                                                    {(provided) => (
+                                                    <div {...provided.droppableProps} ref={provided.innerRef}>
+                                                        {
+                                                        allLists[key][1].map((item, taskKey) => (
+
+                                                            <Draggable type="tasks" key={this.assignTaskIndexForGrag(key, taskKey)} draggableId={`taskDrag${this.assignTaskIndexForGrag(key, taskKey)}`} index={this.assignTaskIndexForGrag(key, taskKey)}>
+                                                                
+                                                                {(provided) => ( 
+                                        
+                                                            <div className={`listName listName${taskKey}`} {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
                                                                 <div className="listNamePar">
                                                                     <p>{item}</p>
                                                                 </div>
@@ -154,16 +221,17 @@ export class CreateLists extends Component {
                                                                         onFocus={(event) => { showInputName(event) }}
                                                                         onBlur={(blurEvent) => { hideInputName(blurEvent) }}
                                                                         onChange={(e) => { this.changeTaskName(e) }}
-                                                                        value={allLists[key][1][listKey]}></input>
+                                                                        value={allLists[key][1][taskKey]}></input>
                                                                 </div>
                                                             </div>
-
-
-
+                                                            )}
+                                                            </Draggable>
 
                                                         ))}
+                                                        {provided.placeholder}
                                                     </div>
-
+                                                    )}
+                                                    </Droppable>
                                                 </div>
                                                 <div className="addCards">
                                                     <div className="addSomeElement" onClick={(e) => this.showAndHideElem(e)}>
