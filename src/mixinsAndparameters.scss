@@ -2,7 +2,6 @@ $fontPlannerName: 'The Nautigal', cursive;
 $fontProjectName: 'EB Garamond', serif;
 $fontText: 'Roboto', sans-serif;
 $fontSizeListName: 20px;
-$projectNameBackground: rgba(71, 40, 22, 0.712);
 $listsBackground: rgba(255, 255, 255, 0.603);
 $tasksCardWidth: 230px;
 $borderRadius: 7px;
@@ -17,9 +16,10 @@ $borderRadius: 7px;
 }
 
 
-@mixin nameOfElem($fontSize, $fontFamily, $inputWidth, $fontColor) {
+@mixin nameOfElem($fontSize, $fontFamily, $inputWidth, $fontColor, $inputPadding, $inputZindex) {
   display: flex;
   justify-content: center;
+  position: relative;
 
 & .namePar {
   position: absolute;
@@ -36,8 +36,8 @@ $borderRadius: 7px;
   }
 }
 & .nameInput {
-  padding: 10px;
-  z-index: 1;
+  padding: $inputPadding;
+  z-index: $inputZindex;
 
   & input {
       @include inputForNames;

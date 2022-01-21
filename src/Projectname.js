@@ -7,7 +7,8 @@ export class ProjectName extends Component {
         super();
 
         this.state = {
-            name: "Write the name of the project"
+            name: "Write the name of the project",
+            previousProjectName: ""
         }
     }
 
@@ -15,7 +16,24 @@ export class ProjectName extends Component {
         this.setState({ name: event })
     }
 
+    showInputAndKeepPreviousValue(event) {
+        showInputName(event);
+            this.setState({
+                previousProjectName: event.target.defaultValue
+            })
+    }
 
+    hideInputNameAndAssertEmptyName(event) {
+        hideInputName(event);
+        if (event.target.defaultValue === "" && (event.key === "Enter" || event.type === "blur")) {
+            let previousName = this.state.previousProjectName
+
+            this.setState({
+                name: previousName,
+                previousProjectName: "",
+            })
+        }
+    }
 
     render() {
         return (
@@ -26,8 +44,9 @@ export class ProjectName extends Component {
                     <div className="nameInput">
                         <input type="text"
                             maxLength="34"
-                            onFocus={(event) => { showInputName(event) }}
-                            onBlur={(blurEvent) => { hideInputName(blurEvent) }}
+                            onKeyPress={(blurEvent) => { this.hideInputNameAndAssertEmptyName(blurEvent) }}
+                            onFocus={(event) => { this.showInputAndKeepPreviousValue(event) }}
+                            onBlur={(blurEvent) => { this.hideInputNameAndAssertEmptyName(blurEvent) }}
                             onChange={(e) => { this.changeProjectName(e.target.value) }}
                             value={this.state.name}></input>
                     </div>

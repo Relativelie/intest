@@ -1,7 +1,13 @@
 import { Component } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import plus from './plus.png';
+import create from './create.png'
 import { hideInputName, showInputName, determineListNumber } from "./basefunctions";
+
+
+const blabla = (isDraggingOver) => (
+    { background: isDraggingOver ? 'rgba(91, 201, 173, 0.685)' : 'none', }
+);
 
 
 export class CreateLists extends Component {
@@ -11,43 +17,49 @@ export class CreateLists extends Component {
         this.state = {
             lists: [],
             listNumber: 0,
-            taskName: ""
+            taskName: "", 
+            previousName: ""
         }
     }
 
+    // add new block of a list
     addNewList() {
         let list = this.state.listNumber;
         let allLists = this.state.lists;
         if (list != 15) {
             allLists[list] = ["Rename the list", []];
-
             this.setState({
                 lists: allLists,
                 listNumber: this.state.listNumber + 1
             });
         }
         else alert("Only 15 lists can be created")
-
     }
 
+    // add a new task in the list
     addCard(event) {
-        let elemKey = determineListNumber(event, {elementName: "addTask"});
-        let allLists = this.state.lists;
-        if (this.state.taskName != "") {
-            allLists[elemKey][1].push(this.state.taskName);
-            this.setState({
-                taskName: "",
-                lists: allLists
-            })
+        if (event.key === "Enter" || event.type === "click") {
+            let elemKey = determineListNumber(event, { elementName: "addTask" });
+            let allLists = this.state.lists;
+            if (this.state.taskName != "") {
+                allLists[elemKey][1].push(this.state.taskName);
+                this.setState({
+                    taskName: "",
+                    lists: allLists
+                })
+            }
         }
+
     }
 
     changeTaskName(event) {
         this.setState({ taskName: event })
     }
 
+    // show input in add task block
     showAndHideElem(e) {
         const hiddenElem = e.target;
+
         if (hiddenElem.className === "overlap") {
             hiddenElem.parentElement.classList.add("hideElem");
             hiddenElem.parentElement.parentElement.children[1].classList.remove("hideElem");
@@ -66,20 +78,57 @@ export class CreateLists extends Component {
     }
 
     changeElemName(event, elem) {
-        let elemKey = determineListNumber(event, {elementName: elem});
-        let allLists = this.state.lists;
-        if (elem === "list") {
-            allLists[elemKey][0] = event.target.value;
-        }
         
-        else if (elem === "task") {
-            allLists[elemKey][1][elemKey] = event.target.value;
+            let elemKey = determineListNumber(event, { elementName: elem });
+            let allLists = this.state.lists;
+            if (elem === "list") {
+                allLists[elemKey][0] = event.target.value;
+            }
+    
+            else if (elem === "task") {
+                allLists[elemKey[1]][1][elemKey[0]] = event.target.value;
+            }
+    
+    
+            this.setState({
+                taskName: "",
+                lists: allLists
+            })
+    }
+
+    hideInputNameAndAssertEmptyName(event, elem) {
+        hideInputName(event)
+        console.log(event)
+        if (event.target.defaultValue === "" && (event.key === "Enter" || event.type === "blur")) {
+            let elemKey = determineListNumber(event, { elementName: elem });
+            let allLists = this.state.lists;
+            if (elem === "list") {
+                allLists[elemKey][0] = this.state.previousName;
+            }
+    
+            else if (elem === "task") {
+                allLists[elemKey[1]][1][elemKey[0]] = this.state.previousName;
+            }
+
+            this.setState({
+                previousName: ""
+            })
+        }
+    }
+
+    showInputAndKeepPreviousValue(event) {
+        showInputName(event);
+        if (event.type === "focus") {
+            this.setState({
+                previousName: event.target.defaultValue
+            })
         }
 
-        this.setState({
-            taskName: "",
-            lists: allLists
-        })
+        else if (event.type === "click") {
+            this.setState({
+                previousName: event.target.parentElement.children[0].innerText
+            })
+        }
     }
 
 
@@ -87,24 +136,41 @@ export class CreateLists extends Component {
 
         return (
             <div className={props.blockName}>
-    
+
                 <div className="namePar">
                     <p>{props.parText}</p>
                 </div>
-    
+
                 <div className="nameInput">
                     <input type="text"
                         maxLength="17"
-                        onFocus={(event) => { showInputName(event) }}
-                        onBlur={(blurEvent) => { hideInputName(blurEvent) }}
+                        onFocus={(event) => { this.showInputAndKeepPreviousValue(event) }}
+                        onBlur={(blurEvent) => { this.hideInputNameAndAssertEmptyName(blurEvent, "list") }}
                         onChange={(e) => { this.changeElemName(e, props.elementName) }}
+                        onKeyPress={(blurEvent) => { this.hideInputNameAndAssertEmptyName(blurEvent, "list") }}
                         value={props.inputValue}></input>
                 </div>
             </div>
         )
     }
 
+    handleOnDragStart(result) {
+        if (result.source.droppableId != "lists") {
+            let allListsKeys = Object.keys(this.state.lists);
+            let droppableFromList = result.source.droppableId;
+            droppableFromList = droppableFromList.substring(5, droppableFromList.length);
+            allListsKeys.splice(allListsKeys.indexOf(droppableFromList), 1);
+            for (let item = 0; item < allListsKeys.length; item++) {
+                document.querySelector(`[data-rbd-droppable-id="tasks${allListsKeys[item]}"]`).classList.add("availableDrop");
+            }
+        }
+    }
+
     handleOnDragEnd(result) {
+        let allListsKeys = Object.keys(this.state.lists);
+        for (let item = 0; item < allListsKeys.length; item++) {
+            document.querySelector(`[data-rbd-droppable-id="tasks${allListsKeys[item]}"]`).classList.remove("availableDrop")
+        }
         if (result.type === "group") {
             if (!result.destination) return;
             const listOfItems = this.state.lists;
@@ -144,7 +210,7 @@ export class CreateLists extends Component {
         }
     }
 
-    assignTaskIndexForGrag(listNumber, key) {
+    assignTaskIndexForDrag(listNumber, key) {
         let allLists = this.state.lists;
         let numberOfTask = 0;
         if (!allLists[listNumber - 1]) return parseInt(key);
@@ -169,6 +235,8 @@ export class CreateLists extends Component {
     }
 
 
+
+
     render() {
         let allLists = this.state.lists;
 
@@ -183,15 +251,14 @@ export class CreateLists extends Component {
                     </div>
                 </div>
 
-                <DragDropContext onDragEnd={this.handleOnDragEnd.bind(this)}>
+                <DragDropContext onDragEnd={this.handleOnDragEnd.bind(this)} onDragStart={this.handleOnDragStart.bind(this)}>
 
                     <Droppable droppableId="lists" direction="horizontal" type="group">
                         {(provided) => (
-                            <div className="createdListsContainer" {...provided.droppableProps} ref={provided.innerRef} >
+                            <div className="createdListsContainer" {...provided.droppableProps} ref={provided.innerRef}>
                                 {Object.keys(allLists).map((key, index) => (
                                     <Draggable type="group" key={key} draggableId={`list${key}`} index={index}>
                                         {(provided) => (
-
                                             <div className={`createdList list createdList${key}`} {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
                                                 {this.nameOfElements({
                                                     blockName: "listName",
@@ -200,27 +267,40 @@ export class CreateLists extends Component {
                                                     inputValue: allLists[key][0]
                                                 })}
                                                 <div>
-
                                                     <Droppable droppableId={`tasks${key}`} type="tasks">
-                                                        {(provided) => (
-                                                            <div {...provided.droppableProps} ref={provided.innerRef}>
+                                                        {(provided, snapshot) => (
+                                                            <div className="tasksContainer" {...provided.droppableProps} ref={provided.innerRef}
+                                                                style={blabla(snapshot.isDraggingOver, provided.droppableProps.style)}>
                                                                 {allLists[key][1].map((item, taskKey) => (
 
-                                                                        <Draggable type="tasks" key={this.assignTaskIndexForGrag(key, taskKey)} draggableId={`taskDrag${this.assignTaskIndexForGrag(key, taskKey)}`} index={this.assignTaskIndexForGrag(key, taskKey)}>
+                                                                    <Draggable type="tasks" key={this.assignTaskIndexForDrag(key, taskKey)} draggableId={`taskDrag${this.assignTaskIndexForDrag(key, taskKey)}`} index={this.assignTaskIndexForDrag(key, taskKey)}>
 
-                                                                            {(provided) => (
-                                                                                <div className={`listName${taskKey}`} {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
-                                                                                    {this.nameOfElements({
-                                                                                        blockName: "listName",
-                                                                                        elementName: "task",
-                                                                                        parText: item,
-                                                                                        inputValue: allLists[key][1][taskKey]
-                                                                                    })}
+                                                                        {(provided) => (
+                                                                            <div className={`listName${taskKey}`} {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
+                                                                                <div className="editTaskName">
+                                                                                    <div className="taskName">
+                                                                                        <div className="namePar">
+                                                                                            <p>{item}</p>
+                                                                                        </div>
+
+                                                                                        <div className="nameInput">
+                                                                                            <input className="taskNameInput" type="text"
+                                                                                                maxLength="17"
+                                                                                                onKeyPress={(blurEvent) => { this.hideInputNameAndAssertEmptyName(blurEvent, "task") }}
+                                                                                                onBlur={(blurEvent) => { this.hideInputNameAndAssertEmptyName(blurEvent, "task") }}
+                                                                                                onChange={(e) => { this.changeElemName(e, "task") }}
+                                                                                                value={allLists[key][1][taskKey]}></input>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                    <img src={create} onClick={(event) => { this.showInputAndKeepPreviousValue(event) }}></img>
                                                                                 </div>
-                                                                            )}
-                                                                        </Draggable>
+                                                                            </div>
 
-                                                                    ))}
+                                                                        )}
+                                                                    </Draggable>
+
+                                                                ))}
                                                                 {provided.placeholder}
                                                             </div>
                                                         )}
@@ -238,16 +318,14 @@ export class CreateLists extends Component {
                                                             placeholder="Enter task name"
                                                             onChange={(e) => { this.changeTaskName(e.target.value) }}
                                                             onBlur={(blurEvent) => { this.showAndHideElem(blurEvent) }}
+                                                            onKeyPress={(event) => { this.addCard(event) }}
                                                             value={this.state.taskName}></input>
                                                         <button className="btnAddCard" onClick={(event) => this.addCard(event)}>Add card</button>
-                                                        <button onClick={(e) => this.showAndHideElem(e)}>X</button>
+                                                        <button className="btnCancelAddCard" onClick={(e) => this.showAndHideElem(e)}>X</button>
                                                     </div>
                                                 </div>
-
                                             </div>
-
                                         )}
-
                                     </Draggable>
                                 ))}
                                 {provided.placeholder}
