@@ -5,7 +5,7 @@ import create from './create.png'
 import { hideInputName, showInputName, determineListNumber } from "./basefunctions";
 
 
-const blabla = (isDraggingOver) => (
+const tasksBlockBg = (isDraggingOver) => (
     { background: isDraggingOver ? 'rgba(91, 201, 173, 0.685)' : 'none', }
 );
 
@@ -17,7 +17,7 @@ export class CreateLists extends Component {
         this.state = {
             lists: [],
             listNumber: 0,
-            taskName: "", 
+            taskName: "",
             previousName: ""
         }
     }
@@ -56,7 +56,7 @@ export class CreateLists extends Component {
         this.setState({ taskName: event })
     }
 
-    // show input in add task block
+    // show input in block of adding task 
     showAndHideElem(e) {
         const hiddenElem = e.target;
 
@@ -77,35 +77,34 @@ export class CreateLists extends Component {
         }
     }
 
+    // change task or list name
     changeElemName(event, elem) {
-        
-            let elemKey = determineListNumber(event, { elementName: elem });
-            let allLists = this.state.lists;
-            if (elem === "list") {
-                allLists[elemKey][0] = event.target.value;
-            }
-    
-            else if (elem === "task") {
-                allLists[elemKey[1]][1][elemKey[0]] = event.target.value;
-            }
-    
-    
-            this.setState({
-                taskName: "",
-                lists: allLists
-            })
+
+        let elemKey = determineListNumber(event, { elementName: elem });
+        let allLists = this.state.lists;
+        if (elem === "list") {
+            allLists[elemKey][0] = event.target.value;
+        }
+
+        else if (elem === "task") {
+            allLists[elemKey[1]][1][elemKey[0]] = event.target.value;
+        }
+
+        this.setState({
+            taskName: "",
+            lists: allLists
+        })
     }
 
-    hideInputNameAndAssertEmptyName(event, elem) {
-        hideInputName(event)
-        console.log(event)
+    hideNameEditingAndAssertForEmpty(event, elem) {
+        hideInputName(event);
         if (event.target.defaultValue === "" && (event.key === "Enter" || event.type === "blur")) {
             let elemKey = determineListNumber(event, { elementName: elem });
             let allLists = this.state.lists;
             if (elem === "list") {
                 allLists[elemKey][0] = this.state.previousName;
             }
-    
+
             else if (elem === "task") {
                 allLists[elemKey[1]][1][elemKey[0]] = this.state.previousName;
             }
@@ -116,7 +115,9 @@ export class CreateLists extends Component {
         }
     }
 
-    showInputAndKeepPreviousValue(event) {
+
+    // keep previous value for using in hideNameEditingAndAssertForEmpty() in case name is empty
+    showNameEditingAndKeepPreviousValue(event) {
         showInputName(event);
         if (event.type === "focus") {
             this.setState({
@@ -142,18 +143,19 @@ export class CreateLists extends Component {
                 </div>
 
                 <div className="nameInput">
-                    <input type="text"
+                    <input className={props.inputClass} type="text"
                         maxLength="17"
-                        onFocus={(event) => { this.showInputAndKeepPreviousValue(event) }}
-                        onBlur={(blurEvent) => { this.hideInputNameAndAssertEmptyName(blurEvent, "list") }}
+                        onFocus={props.onFocusFunc}
+                        onBlur={(blurEvent) => { this.hideNameEditingAndAssertForEmpty(blurEvent, props.elementName) }}
                         onChange={(e) => { this.changeElemName(e, props.elementName) }}
-                        onKeyPress={(blurEvent) => { this.hideInputNameAndAssertEmptyName(blurEvent, "list") }}
+                        onKeyPress={(blurEvent) => { this.hideNameEditingAndAssertForEmpty(blurEvent, props.elementName) }}
                         value={props.inputValue}></input>
                 </div>
             </div>
         )
     }
 
+    // show block where task may be moved
     handleOnDragStart(result) {
         if (result.source.droppableId != "lists") {
             let allListsKeys = Object.keys(this.state.lists);
@@ -166,11 +168,14 @@ export class CreateLists extends Component {
         }
     }
 
+
     handleOnDragEnd(result) {
         let allListsKeys = Object.keys(this.state.lists);
         for (let item = 0; item < allListsKeys.length; item++) {
             document.querySelector(`[data-rbd-droppable-id="tasks${allListsKeys[item]}"]`).classList.remove("availableDrop")
         }
+
+        // drop lists
         if (result.type === "group") {
             if (!result.destination) return;
             const listOfItems = this.state.lists;
@@ -182,6 +187,7 @@ export class CreateLists extends Component {
                 lists: items
             })
         }
+        // drop tasks
         else if (result.type === "tasks") {
             let allLists = this.state.lists;
             if (!result.destination) return;
@@ -235,8 +241,6 @@ export class CreateLists extends Component {
     }
 
 
-
-
     render() {
         let allLists = this.state.lists;
 
@@ -264,39 +268,34 @@ export class CreateLists extends Component {
                                                     blockName: "listName",
                                                     elementName: "list",
                                                     parText: allLists[key][0],
-                                                    inputValue: allLists[key][0]
+                                                    inputValue: allLists[key][0],
+                                                    inputClass: null,
+                                                    onFocusFunc: (event) => { this.showNameEditingAndKeepPreviousValue(event) }
                                                 })}
                                                 <div>
                                                     <Droppable droppableId={`tasks${key}`} type="tasks">
                                                         {(provided, snapshot) => (
                                                             <div className="tasksContainer" {...provided.droppableProps} ref={provided.innerRef}
-                                                                style={blabla(snapshot.isDraggingOver, provided.droppableProps.style)}>
+                                                                style={tasksBlockBg(snapshot.isDraggingOver)}>
                                                                 {allLists[key][1].map((item, taskKey) => (
 
-                                                                    <Draggable type="tasks" key={this.assignTaskIndexForDrag(key, taskKey)} draggableId={`taskDrag${this.assignTaskIndexForDrag(key, taskKey)}`} index={this.assignTaskIndexForDrag(key, taskKey)}>
-
+                                                                    <Draggable type="tasks" key={this.assignTaskIndexForDrag(key, taskKey)}
+                                                                        draggableId={`taskDrag${this.assignTaskIndexForDrag(key, taskKey)}`}
+                                                                        index={this.assignTaskIndexForDrag(key, taskKey)}>
                                                                         {(provided) => (
                                                                             <div className={`listName${taskKey}`} {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
                                                                                 <div className="editTaskName">
-                                                                                    <div className="taskName">
-                                                                                        <div className="namePar">
-                                                                                            <p>{item}</p>
-                                                                                        </div>
-
-                                                                                        <div className="nameInput">
-                                                                                            <input className="taskNameInput" type="text"
-                                                                                                maxLength="17"
-                                                                                                onKeyPress={(blurEvent) => { this.hideInputNameAndAssertEmptyName(blurEvent, "task") }}
-                                                                                                onBlur={(blurEvent) => { this.hideInputNameAndAssertEmptyName(blurEvent, "task") }}
-                                                                                                onChange={(e) => { this.changeElemName(e, "task") }}
-                                                                                                value={allLists[key][1][taskKey]}></input>
-                                                                                        </div>
-                                                                                    </div>
-
-                                                                                    <img src={create} onClick={(event) => { this.showInputAndKeepPreviousValue(event) }}></img>
+                                                                                    {this.nameOfElements({
+                                                                                        blockName: "taskName",
+                                                                                        elementName: "task",
+                                                                                        parText: item,
+                                                                                        inputValue: allLists[key][1][taskKey],
+                                                                                        inputClass: "taskNameInput",
+                                                                                        onFocusFunc: null
+                                                                                    })}
+                                                                                    <img src={create} onClick={(event) => { this.showNameEditingAndKeepPreviousValue(event) }}></img>
                                                                                 </div>
                                                                             </div>
-
                                                                         )}
                                                                     </Draggable>
 
