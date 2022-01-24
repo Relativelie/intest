@@ -11,18 +11,58 @@ body {
   @include nameOfElem(
     $fontSize: clamp(10px, 4vw, 40px), 
     $fontFamily: $fontProjectName,
+    $inputPadding: 10px,
     $inputWidth: 700px,
-    $fontColor: white
+    $fontColor: white,
+    $inputZindex: 1
     );
 }
 
 .listName {
-  @include nameOfElem(
-    $fontSize: $fontSizeListName, 
-    $fontFamily: $fontProjectName,
-    $inputWidth: none,
-    $fontColor: none
-    );
+    @include nameOfElem(
+      $fontSize: $fontSizeListName, 
+      $fontFamily: $fontProjectName,
+      $inputPadding: 10px,
+      $inputWidth: none,
+      $fontColor: white,
+      $inputZindex: 1
+      );
+
+}
+
+.tasksContainer {
+  height: 400px;
+}
+
+
+.editTaskName {
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+  background-color: rgba(10, 73, 110, 0.322);
+  border-radius: $borderRadius;
+  margin: 1.5%;
+
+
+  & .taskName {
+    @include nameOfElem(
+      $fontSize: $fontSizeListName, 
+      $fontFamily: $fontProjectName,
+      $inputPadding: 10px 0,
+      $inputWidth: none,
+      $fontColor: none,
+      $inputZindex: -1
+      );
+  }
+
+  & img {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    z-index: 2;
+    cursor: pointer;
+    margin-top: 1%;
+  }
 }
 
 .App h1 {
@@ -43,6 +83,7 @@ body {
 
 .showNameInput {
     opacity: 1 !important;
+    z-index: 2 !important;
   }
 
 .addNewListContainer {
@@ -70,7 +111,7 @@ body {
   align-items: center;
   justify-content: center;
   height: min-content;
-  padding: 5px;
+  cursor: pointer;
 
   & img {
     height: 20px;
@@ -81,12 +122,23 @@ body {
 .createdListsContainer {
   display: grid;
   grid-template-columns: repeat(15, $tasksCardWidth);
+  grid-template-rows: 1fr;
   grid-column-gap: 10px;
 
   & .createdList {
-    padding: 5px;
+    padding: 20px 5px;
     text-align: center;
     border-radius: $borderRadius;
+
+    & .listName{
+      background-color: rgba(0, 0, 0, 0.459);
+      border-radius: 10px;
+    }
+  }
+
+  & .tasksContainer {
+    overflow-y: auto;
+    margin-top: 3%;
   }
 }
 
@@ -103,8 +155,40 @@ body {
 }
 
 
+.inputFieldForTasks {
+  
+  & input {
+    margin: 5px;
+  }
+
+  & button {
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: ease-in-out .2s;
+  }
+
+  & .btnAddCard {
+    background-color: rgba(188, 248, 172, 0.637);
+  }
+
+  & .btnAddCard:hover {
+    background-color: rgb(32, 134, 7);
+  }
+
+  & .btnCancelAddCard:hover {
+    background-color: rgb(245, 169, 146);
+  }
+}
+
 .overlap {
     position: absolute;
-    height: 60px;
+    height: 50px;
     width: $tasksCardWidth;
+}
+
+.availableDrop {
+  border: 3px dashed rgb(21, 255, 0);
 }
