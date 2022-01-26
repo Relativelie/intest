@@ -1,6 +1,6 @@
-import './App.css';
-import { ProjectName } from './Projectname';
-import { CreateLists } from './Createlists';
+import './stylesheets/css/App.css';
+import { ProjectName } from './components/Projectname';
+import { CreateLists } from './components/Createlists';
 
 function App() {
   return (

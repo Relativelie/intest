@@ -1,7 +1,7 @@
-import { Component } from "react";
+import React, { Component } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import plus from './plus.png';
-import create from './create.png'
+import plus from '../images/plus.png';
+import create from '../images/create.png'
 import { hideInputName, showInputName, determineListNumber } from "./basefunctions";
 
 
@@ -26,14 +26,14 @@ export class CreateLists extends Component {
     addNewList() {
         let list = this.state.listNumber;
         let allLists = this.state.lists;
-        if (list != 15) {
+        if (list !== 8) {
             allLists[list] = ["Rename the list", []];
             this.setState({
                 lists: allLists,
                 listNumber: this.state.listNumber + 1
             });
         }
-        else alert("Only 15 lists can be created")
+        else alert("Only 8 lists can be created")
     }
 
     // add a new task in the list
@@ -41,7 +41,7 @@ export class CreateLists extends Component {
         if (event.key === "Enter" || event.type === "click") {
             let elemKey = determineListNumber(event, { elementName: "addTask" });
             let allLists = this.state.lists;
-            if (this.state.taskName != "") {
+            if (this.state.taskName !== "") {
                 allLists[elemKey][1].push(this.state.taskName);
                 this.setState({
                     taskName: "",
@@ -66,7 +66,7 @@ export class CreateLists extends Component {
             hiddenElem.parentElement.parentElement.children[1].children[0].focus();
         }
 
-        else if (e.relatedTarget === null || e.relatedTarget.className != "btnAddCard") {
+        else if (e.relatedTarget === null || e.relatedTarget.className !== "btnAddCard") {
             hiddenElem.parentElement.classList.add("hideElem");
             hiddenElem.parentElement.parentElement.children[0].classList.remove("hideElem");
             this.setState({ taskName: "" })
@@ -157,7 +157,7 @@ export class CreateLists extends Component {
 
     // show block where task may be moved
     handleOnDragStart(result) {
-        if (result.source.droppableId != "lists") {
+        if (result.source.droppableId !== "lists") {
             let allListsKeys = Object.keys(this.state.lists);
             let droppableFromList = result.source.droppableId;
             droppableFromList = droppableFromList.substring(5, droppableFromList.length);
@@ -293,7 +293,7 @@ export class CreateLists extends Component {
                                                                                         inputClass: "taskNameInput",
                                                                                         onFocusFunc: null
                                                                                     })}
-                                                                                    <img src={create} onClick={(event) => { this.showNameEditingAndKeepPreviousValue(event) }}></img>
+                                                                                    <img src={create} alt="create element" onClick={(event) => { this.showNameEditingAndKeepPreviousValue(event) }}></img>
                                                                                 </div>
                                                                             </div>
                                                                         )}
