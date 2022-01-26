@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 // functions for rename lists, project, tasks
 export function showInputName(e) {
     if (e.type === "click") {
