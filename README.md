@@ -9,7 +9,7 @@ Used react, <a href="https://github.com/atlassian/react-beautiful-dnd">react-bea
     <li>Planner without lists
         <ul>
             <li>
-                <img src="./src/images/screenshots/emptyPlanner.jpg" width="50%" height="50%"/>
+                <img src="./src/images/screenshots/emptyPlanner.png" width="50%" height="50%"/>
             </li>
         </ul>
     </li>
@@ -37,14 +37,14 @@ Used react, <a href="https://github.com/atlassian/react-beautiful-dnd">react-bea
     <li>Dnd the list:
         <ul>
             <li>
-                <img src="./src/images/screenshots/dndList" width="50%" height="50%"/>
+                <img src="./src/images/screenshots/dndList.png" width="50%" height="50%"/>
             </li>
         </ul>
     </li>
         <li>Dnd the task:
         <ul>
             <li>
-                <img src="./src/images/screenshots/dndTask" width="50%" height="50%"/>
+                <img src="./src/images/screenshots/dndTask.png" width="50%" height="50%"/>
             </li>
         </ul>
     </li>
