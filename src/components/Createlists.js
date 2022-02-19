@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import plus from '../images/plus.png';
 import create from '../images/create.png'
 import { hideInputName, showInputName, determineListNumber } from "./basefunctions";
+import { AddTasks } from "./AddTasks";
 
 
 const tasksBlockBg = (isDraggingOver) => (
@@ -53,6 +54,7 @@ export class CreateLists extends Component {
     }
 
     changeTaskName(event) {
+        console.log(event)
         this.setState({ taskName: event })
     }
 
@@ -306,23 +308,10 @@ export class CreateLists extends Component {
                                                     </Droppable>
 
                                                 </div>
-                                                <div className="addCards">
-                                                    <div className="addSomeElement" onClick={(e) => this.showAndHideElem(e)}>
-                                                        <div className="overlap"></div>
-                                                        <img src={plus} alt="plus"></img>
-                                                        <p>Add a card</p>
-                                                    </div>
-                                                    <div className="inputFieldForTasks hideElem">
-                                                        <input type="text"
-                                                            placeholder="Enter task name"
-                                                            onChange={(e) => { this.changeTaskName(e.target.value) }}
-                                                            onBlur={(blurEvent) => { this.showAndHideElem(blurEvent) }}
-                                                            onKeyPress={(event) => { this.addCard(event) }}
-                                                            value={this.state.taskName}></input>
-                                                        <button className="btnAddCard" onClick={(event) => this.addCard(event)}>Add card</button>
-                                                        <button className="btnCancelAddCard" onClick={(e) => this.showAndHideElem(e)}>X</button>
-                                                    </div>
-                                                </div>
+                                                <AddTasks plus={plus} showAndHideElem={this.showAndHideElem.bind(this)}
+                                                changeTaskName={this.changeTaskName.bind(this)} addCard={this.addCard.bind(this)}
+                                                taskName={this.state.taskName}
+                                                />
                                             </div>
                                         )}
                                     </Draggable>
