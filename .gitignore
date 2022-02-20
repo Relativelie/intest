@@ -24,4 +24,3 @@ yarn-error.log*
 
 .eslintrc.json
 /src/stylesheets/css/*
-package-lock.json
