@@ -1,7 +1,7 @@
 import React from 'react';
 
 
-export const AddTasks= (props) => {
+export const AddTasksBtn = (props) => {
     const myProps = {...props};
 
     return (

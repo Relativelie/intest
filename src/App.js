@@ -1,7 +1,8 @@
 import React from 'react';
 import './stylesheets/css/App.css';
 import { ProjectName } from './components/Projectname';
-import { CreateLists } from './components/Createlists';
+// import { CreateLists } from './components/Createlists';
+import { ListsBlock } from './components/ListsBlock';
 
 function App() {
   return (
@@ -13,7 +14,8 @@ function App() {
         </div>
       </div>
 
-      <CreateLists />
+      {/* <CreateLists /> */}
+      <ListsBlock/>
     </div>
   );
 }
